@@ -32,7 +32,12 @@ initializeSocket(io);
 app.use(helmet());
 
 // CORS configuration with whitelist (supports multiple dev origins)
-const defaultOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+const defaultOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'https://kidslink-ic378wqp1-thangnds-projects-f913d776.vercel.app',
+  'https://kidslink-be.onrender.com'
+];
 const envOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
   .split(',')
   .map((s) => s.trim())
