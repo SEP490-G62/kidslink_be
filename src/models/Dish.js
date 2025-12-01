@@ -10,6 +10,16 @@ const dishSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true
+  },
+  meal_type: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Meal',
+    required: true
+  },
+  school_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'School',
+    required: true
   }
 }, {
   timestamps: true
