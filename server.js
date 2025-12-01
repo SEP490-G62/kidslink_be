@@ -59,12 +59,38 @@ app.use(cors({
   credentials: true,
 }));
 
-// Rate limiting
+// Rate limiting - Cấu hình chính với giới hạn cao hơn
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 phút
-  max: 100, // giới hạn 100 requests per windowMs
-  message: 'Quá nhiều requests từ IP này, vui lòng thử lại sau.'
+  max: 500, // tăng lên 500 requests per windowMs (từ 100)
+  message: {
+    error: 'Quá nhiều requests',
+    message: 'Bạn đã vượt quá giới hạn requests. Vui lòng thử lại sau.',
+    retryAfter: '15 phút'
+  },
+  standardHeaders: true, // Trả về rate limit info trong headers `RateLimit-*`
+  legacyHeaders: false, // Tắt `X-RateLimit-*` headers cũ
+  skip: (req) => {
+    // Loại trừ các route không cần rate limiting
+    const excludedPaths = [
+      '/health',
+      '/',
+      '/uploads'
+    ];
+    return excludedPaths.some(path => req.path.startsWith(path));
+  },
+  handler: (req, res) => {
+    res.status(429).json({
+      error: 'Quá nhiều requests',
+      message: 'Bạn đã vượt quá giới hạn requests. Vui lòng thử lại sau.',
+      retryAfter: '15 phút',
+      limit: 500,
+      window: '15 phút'
+    });
+  }
 });
+
+// Áp dụng rate limiting cho tất cả routes (trừ các route đã loại trừ)
 app.use(limiter);
 
 // Logging
