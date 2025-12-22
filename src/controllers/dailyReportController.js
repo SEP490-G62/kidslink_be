@@ -500,7 +500,8 @@ const updateComment = async (req, res) => {
       if (!classDoc) {
         return res.status(403).json({ error: 'Học sinh không thuộc lớp mà bạn phụ trách' });
       }
-      const hasSchedule = await hasScheduleForClassDate(classDoc._id, todayStart);
+      // Quan trọng: dùng todayStr (YYYY-MM-DD) để kiểm tra lịch, tránh lệch múi giờ trên server deploy (UTC)
+      const hasSchedule = await hasScheduleForClassDate(classDoc._id, todayStr);
       if (!hasSchedule) {
         return res.status(400).json({ error: 'Lớp không có lịch học hôm nay nên không thể nhận xét' });
       }
