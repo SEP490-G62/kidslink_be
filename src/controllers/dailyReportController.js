@@ -493,8 +493,10 @@ const updateComment = async (req, res) => {
       }
       // kiểm tra đã có report hôm nay chưa
       // Tính ngày bắt đầu và kết thúc theo múi giờ Việt Nam
-      const todayStart = new Date(todayStr + 'T00:00:00+07:00');
-      const todayEnd = new Date(todayStr + 'T23:59:59+07:00');
+      // Để tránh lệch múi giờ giữa môi trường local và deploy, dùng year-month-day tách rời
+      const [year, month, day] = todayStr.split('-').map(Number);
+      const todayStart = new Date(year, month - 1, day, 0, 0, 0, 0);
+      const todayEnd = new Date(year, month - 1, day, 23, 59, 59, 999);
 
       const classDoc = await getTeacherClassForStudent(student._id, teacher_id);
       if (!classDoc) {
@@ -528,9 +530,10 @@ const updateComment = async (req, res) => {
       } else {
         // Chưa có report, tạo mới cho hôm nay với comments (không checkin)
         // Khi chỉ comment, không cần teacher_checkin_id
-        const todayStart = new Date(todayStr + 'T00:00:00+07:00');
+        const [yearCreate, monthCreate, dayCreate] = todayStr.split('-').map(Number);
+        const todayStartLocal = new Date(yearCreate, monthCreate - 1, dayCreate, 0, 0, 0, 0);
         let newReport = new DailyReport({
-          report_date: todayStart,
+          report_date: todayStartLocal,
           checkin_time: undefined,
           checkout_time: undefined,
           comments: comments || 'Nghỉ',
